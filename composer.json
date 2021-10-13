@@ -1,0 +1,23 @@
+{
+  "name": "biera/filter",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Biera\\Filter\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Kuba Biernacki",
+      "email": "kubiernacki@gmail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require-dev": {
+    "phpunit/phpunit": "^9.5"
+  },
+  "require": {
+    "ext-json": "*"
+  }
+}
