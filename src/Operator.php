@@ -404,6 +404,7 @@ final class Operator implements JsonSerializable
                         || is_float($literal)
                         || is_int($literal)
                         || is_null($literal)
+                        || is_bool($literal)
                     )
                 ) {
                     throw new InvalidArgumentException(
