@@ -47,6 +47,7 @@ class FilterExpressionFactory
             case Operator::GT :
             case Operator::GTE :
             case Operator::IN :
+            case Operator::NOT_IN :
             case Operator::EQ :
             case Operator::NEQ :
             case Operator::LIKE :
@@ -56,11 +57,15 @@ class FilterExpressionFactory
 
                 return Operator::{$operator}($identifier, $expression[$operator][$identifier]);
 
-            case Operator::NULL     :
+            case Operator::NULL :
             case Operator::NOT_NULL :
                 !$validate || self::assertUnaryOperatorOperandValid($expression, $operator);
 
                 return Operator::{$operator}($expression[$operator]);
+
+            case Operator::TRUE :
+            case Operator::FALSE :
+                return Operator::{$operator}();
 
             default :
                 throw new RuntimeException(

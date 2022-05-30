@@ -33,6 +33,20 @@ class FilterExpressionFactoryTest extends TestCase
             [
                 json_encode(
                     [
+                        'true' => null
+                    ]
+                )
+            ],
+            [
+                json_encode(
+                    [
+                        'false' => null
+                    ]
+                )
+            ],
+            [
+                json_encode(
+                    [
                         'null' => 'email'
                     ]
                 )
@@ -143,6 +157,9 @@ class FilterExpressionFactoryTest extends TestCase
                             ],
                             [
                                 'null' => 'password'
+                            ],
+                            [
+                                'true' => null
                             ]
                         ]
                     ]

@@ -14,6 +14,24 @@ final class FilterExpressionBuilder
         return new self();
     }
 
+    public function true(): FilterExpressionBuilder
+    {
+        $this->assertCallableInCurrentContext(__FUNCTION__);
+        $this->operator(Operator::TRUE);
+        $this->end();
+
+        return $this;
+    }
+
+    public function false(): FilterExpressionBuilder
+    {
+        $this->assertCallableInCurrentContext(__FUNCTION__);
+        $this->operator(Operator::FALSE);
+        $this->end();
+
+        return $this;
+    }
+
     public function null(string $identifier): FilterExpressionBuilder
     {
         $this->assertCallableInCurrentContext(__FUNCTION__);
@@ -93,6 +111,15 @@ final class FilterExpressionBuilder
         return $this;
     }
 
+    public function notIn(string $identifier, array $value): FilterExpressionBuilder
+    {
+        $this->assertCallableInCurrentContext(__FUNCTION__);
+        $this->operator(Operator::NOT_IN, $identifier, $value);
+        $this->end();
+
+        return $this;
+    }
+
     public function like(string $identifier, string $value): FilterExpressionBuilder
     {
         $this->assertCallableInCurrentContext(__FUNCTION__);
@@ -157,8 +184,10 @@ final class FilterExpressionBuilder
 
     private function operator(string $operatorType, string $identifier = null, $value = null): void
     {
+        if (Operator::TRUE == $operatorType || Operator::FALSE == $operatorType) {
+            $node = new ArrayObject([$operatorType => null]);
         // "and" & "or" operators
-        if (is_null($identifier)) {
+        } else if (is_null($identifier)) {
             $node = new ArrayObject([$operatorType => new ArrayObject()]);
         } else {
             $node = is_null($value)
@@ -192,6 +221,8 @@ final class FilterExpressionBuilder
         switch ($method) {
             case Operator::AND:
             case Operator::OR:
+            case Operator::TRUE:
+            case Operator::FALSE:
             case Operator::NULL:
             case Operator::NOT_NULL:
             case Operator::LT:
@@ -199,6 +230,7 @@ final class FilterExpressionBuilder
             case Operator::GT:
             case Operator::GTE:
             case Operator::IN:
+            case Operator::NOT_IN:
             case Operator::EQ:
             case Operator::NEQ:
             case Operator::LIKE:
@@ -210,6 +242,8 @@ final class FilterExpressionBuilder
                     !in_array(
                         $context,
                         [
+                            Operator::TRUE,
+                            Operator::FALSE,
                             Operator::NULL,
                             Operator::NOT_NULL,
                             Operator::LT,
@@ -217,6 +251,7 @@ final class FilterExpressionBuilder
                             Operator::GT,
                             Operator::GTE,
                             Operator::IN,
+                            Operator::NOT_IN,
                             Operator::EQ,
                             Operator::NEQ,
                             Operator::LIKE,

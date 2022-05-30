@@ -106,6 +106,16 @@ class FilterExpressionBuilderTest extends TestCase
         return [
             [
                 FilterExpressionBuilder::create()
+                    ->true(),
+                '{"true":null}'
+            ],
+            [
+                FilterExpressionBuilder::create()
+                    ->false(),
+                '{"false":null}'
+            ],
+            [
+                FilterExpressionBuilder::create()
                     ->null('email'),
                 '{"null":"email"}'
             ],
@@ -138,6 +148,11 @@ class FilterExpressionBuilderTest extends TestCase
                 FilterExpressionBuilder::create()
                     ->in('id', [1, 2, 3]),
                 '{"in":{"id":[1,2,3]}}'
+            ],
+            [
+                FilterExpressionBuilder::create()
+                    ->notIn('id', [1, 2, 3]),
+                '{"notIn":{"id":[1,2,3]}}'
             ],
             [
                 FilterExpressionBuilder::create()

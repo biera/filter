@@ -15,6 +15,7 @@ final class Operator implements JsonSerializable
     public const EQ = 'eq';
     public const NEQ = 'neq';
     public const IN = 'in';
+    public const NOT_IN = 'notIn';
     public const LT = 'lt';
     public const LTE = 'lte';
     public const GT = 'gt';
@@ -22,6 +23,8 @@ final class Operator implements JsonSerializable
     public const LIKE = 'like';
     public const NULL = 'null';
     public const NOT_NULL = 'notNull';
+    public const TRUE = 'true';
+    public const FALSE = 'false';
 
     private array $operands;
     private string $type;
@@ -75,6 +78,7 @@ final class Operator implements JsonSerializable
                 self::EQ,
                 self::NEQ,
                 self::IN,
+                self::NOT_IN,
                 self::LT,
                 self::LTE,
                 self::GT,
@@ -91,7 +95,7 @@ final class Operator implements JsonSerializable
 
     public function isTerminal(): bool
     {
-        return $this->isUnary() || $this->isBinary();
+        return $this->isUnary() || $this->isBinary() || self::TRUE == $this->type;
     }
 
     /**
@@ -126,6 +130,46 @@ final class Operator implements JsonSerializable
     public static function notNull(string $identifier): Operator
     {
         return self::unary('notNull', $identifier);
+    }
+
+    /**
+     * Constructor for TRUE operator
+     *
+     * Example:
+     *
+     * Operator::true()
+     *
+     * produces: true
+     *
+     * @return Operator
+     */
+    public static function true(): Operator
+    {
+        $operator = new self();
+        $operator->type = self::TRUE;
+        $operator->operands = [];
+
+        return $operator;
+    }
+
+    /**
+     * Constructor for FALSE operator
+     *
+     * Example:
+     *
+     * Operator::false()
+     *
+     * produces: false
+     *
+     * @return Operator
+     */
+    public static function false(): Operator
+    {
+        $operator = new self();
+        $operator->type = self::FALSE;
+        $operator->operands = [];
+
+        return $operator;
     }
 
     /**
@@ -192,6 +236,28 @@ final class Operator implements JsonSerializable
         self::assertLiteralIsValid(self::IN, $literal);
 
         return self::binary(self::IN, $identifier, $literal);
+    }
+
+    /**
+     * Constructor for NOT IN operator
+     *
+     * Example:
+     *
+     * Operator::notIn(
+     *  new Identifier('id'), new Literal([10, 11, 12])
+     * )
+     *
+     * produces "id NOT IN (10, 11, 12)"
+     *
+     * @param string $identifier
+     * @param mixed $literal
+     * @return Operator
+     */
+    public static function notIn(string $identifier, $literal): Operator
+    {
+        self::assertLiteralIsValid(self::NOT_IN, $literal);
+
+        return self::binary(self::NOT_IN, $identifier, $literal);
     }
 
     /**
@@ -446,10 +512,11 @@ final class Operator implements JsonSerializable
 
                 break;
 
+            case self::NOT_IN:
             case self::IN:
                 if (!is_array($literal)) {
                     throw new InvalidArgumentException(
-                        'Second operand of "in" operator must be of array type.'
+                        'Second operand of "in"/"notIn" operator must be of array type.'
                     );
                 }
 
@@ -472,6 +539,8 @@ final class Operator implements JsonSerializable
             return [$this->type => [$this->identifier() => $this->literal()]];
         } elseif ($this->isUnary()) {
             return [$this->type => $this->identifier()];
+        } elseif (self::TRUE === $this->type || self::FALSE === $this->type) {
+            return [$this->type => null];
         } else {
             return [$this->type => $this->operands];
         }
